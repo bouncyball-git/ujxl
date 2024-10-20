@@ -1,5 +1,5 @@
 # ujxl
-Jpeg XL universal batch utility (wrapper for jxl official binaries)
+Jpeg XL universal batch utility (wrapper for jxl official binaries https://github.com/libjxl/libjxl)
 
 Usage: ujxl.exe [path/]pattern [destination]
 
