@@ -16,7 +16,7 @@ func main() {
 
 	args := os.Args
 	if len(args) <= 1 {
-		fmt.Printf("Usage: %s \"[path]filename|wildcard.ext\" [\"destination path\"]", filepath.Base(args[0]))
+		fmt.Printf("Usage: %s \"[path]filename|wildcard.ext\" [destination path]", filepath.Base(args[0]))
 		return
 	}
 
