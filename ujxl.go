@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"sync"
 
@@ -17,16 +16,18 @@ func main() {
 
 	args := os.Args
 	if len(args) <= 1 {
-		fmt.Printf("Usage: %s [path/]pattern [destination]", filepath.Base(args[0]))
+		fmt.Printf("Usage: %s \"[path]filename|wildcard.ext\" [\"destination path\"]", filepath.Base(args[0]))
 		return
 	}
 
 	ex, err := os.Executable()
 	if err != nil {
-		panic(err)
+		fmt.Println("Error:", err)
+		return
 	}
+
 	exPath := filepath.Dir(ex)
-	cfg, err := ini.Load(exPath + "\\" + "ujxl.ini")
+	cfg, err := ini.Load(exPath + string(os.PathSeparator) + "ujxl.ini")
 	if err != nil {
 		fmt.Println("Error loading config:", err)
 		return
@@ -38,11 +39,12 @@ func main() {
 	var doneIndex int
 	var mu sync.Mutex
 
-	inPattern := args[1]
+	inPattern := string(args[1])
 	destination := ""
 	if len(os.Args) > 2 {
-		destination = args[2]
+		destination = string(args[2])
 	}
+
 	defaultSec := cfg.Section("default")
 	appFilename := defaultSec.Key("app-filename").String()
 	maxWorkers, err := defaultSec.Key("max-workers").Int64()
@@ -64,16 +66,16 @@ func main() {
 	}
 
 	switch appFilename {
-	case "cjxl.exe":
-		cfgSec = cfg.Section("cjxl.exe")
+	case "cjxl":
+		cfgSec = cfg.Section("cjxl")
 		cmdLine = []string{
 			"--distance=" + cfgSec.Key("distance").String(),
 			"--effort=" + cfgSec.Key("effort").String(),
 			"--num_threads=" + numThreads,
 			"-v",
 		}
-	case "djxl.exe":
-		cfgSec = cfg.Section("djxl.exe")
+	case "djxl":
+		cfgSec = cfg.Section("djxl")
 		cmdLine = []string{
 			"--jpeg_quality=" + cfgSec.Key("quality").String(),
 			"--color_space=" + cfgSec.Key("color-space").String(),
@@ -96,7 +98,7 @@ func main() {
 			if len(destination) > 0 {
 				dir = destination
 			}
-			outFilename := filepath.Clean(dir) + "\\" + file[0:len(file)-len(path.Ext(file))] + cfgSec.Key("out-ext").String()
+			outFilename := filepath.Clean(dir) + string(os.PathSeparator) + file[:len(file)-len(filepath.Ext(file))] + cfgSec.Key("out-ext").String()
 			argList := append([]string{filename, outFilename}, cmdLine...)
 			output, err := exec.Command(appFilename, argList...).CombinedOutput()
 			if err != nil {
