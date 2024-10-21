@@ -16,7 +16,12 @@ func main() {
 
 	args := os.Args
 	if len(args) <= 1 {
-		fmt.Printf("Usage: %s \"[path]filename|wildcard.ext\" [destination path]", filepath.Base(args[0]))
+		fmt.Printf("Usage: %s \"[path]filename|wildcard.ext\" [destination path]\n", filepath.Base(args[0]))
+		return
+	} else if len(args) > 2 {
+		fmt.Printf("Error: Excessive arguments specified.\n")
+		fmt.Printf("Usage: %s \"[path]filename|wildcard.ext\" [destination path]\n", filepath.Base(args[0]))
+		fmt.Printf(" Note: Did you forget to put first argument in quotation marks?\n")
 		return
 	}
 
