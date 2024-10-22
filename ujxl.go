@@ -38,8 +38,9 @@ func main() {
 		return
 	}
 
-	var cmdLine []string
 	var cfgSec *ini.Section
+	var cmdLine []string
+	var outExt string
 	var Index int
 	var doneIndex int
 	var mu sync.Mutex
@@ -73,17 +74,30 @@ func main() {
 	switch appFilename {
 	case "cjxl":
 		cfgSec = cfg.Section("cjxl")
-		cmdLine = []string{
-			"--distance=" + cfgSec.Key("distance").String(),
-			"--effort=" + cfgSec.Key("effort").String(),
-			"--num_threads=" + numThreads,
-			"-v",
+		outExt = ".jxl"
+		loslessJpeg := cfgSec.Key("lossless").String()
+		if loslessJpeg == "0" {
+			cmdLine = []string{
+				"--lossless_jpeg=" + loslessJpeg,
+				"--effort=" + cfgSec.Key("effort").String(),
+				"--distance=" + cfgSec.Key("distance").String(),
+				"--num_threads=" + numThreads,
+				"-v",
+			}
+		} else {
+			cmdLine = []string{
+				"--lossless_jpeg=" + loslessJpeg,
+				"--effort=" + cfgSec.Key("effort").String(),
+				"--num_threads=" + numThreads,
+				"-v",
+			}
 		}
 	case "djxl":
 		cfgSec = cfg.Section("djxl")
+		outExt = cfgSec.Key("out-ext").String()
 		cmdLine = []string{
-			"--jpeg_quality=" + cfgSec.Key("quality").String(),
 			"--color_space=" + cfgSec.Key("color-space").String(),
+			"--jpeg_quality=" + cfgSec.Key("quality").String(),
 			"--num_threads=" + numThreads,
 			"-v",
 		}
@@ -103,7 +117,7 @@ func main() {
 			if len(destination) > 0 {
 				dir = destination
 			}
-			outFilename := filepath.Clean(dir) + string(os.PathSeparator) + file[:len(file)-len(filepath.Ext(file))] + cfgSec.Key("out-ext").String()
+			outFilename := filepath.Clean(dir) + string(os.PathSeparator) + file[:len(file)-len(filepath.Ext(file))] + outExt
 			argList := append([]string{filename, outFilename}, cmdLine...)
 			output, err := exec.Command(appFilename, argList...).CombinedOutput()
 			if err != nil {
@@ -123,6 +137,7 @@ func main() {
 	if err := pool.Acquire(ctx, maxWorkers); err != nil {
 		fmt.Println("Error:", err)
 	}
+	fmt.Println()
 }
 
 func getFileList(root, pattern string) ([]string, error) {
