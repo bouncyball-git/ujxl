@@ -12,7 +12,11 @@ import (
 	"gopkg.in/ini.v1"
 )
 
+const version = "Jpeg XL universal batch utility, version 0.9.1"
+
 func main() {
+
+	fmt.Println(version)
 
 	args := os.Args
 	if len(args) <= 1 {
