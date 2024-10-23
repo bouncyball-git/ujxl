@@ -10,6 +10,10 @@ Usage: ujxl "[path]filename|wildcard.ext" [destination path]
 * Supports multithreading by specifying maxWorker parameter.
 * config file has help comments.
 
+Compilation:
+Run "compile.bat" under Windows or "compile.sh" under Linux/Macos.
+Script will build binaries for all platforms.
+
 Examples:
 
 djxl
@@ -23,4 +27,4 @@ cjxl
 * ujxl "*.jpg"
 * ujxl "D:\temp\IMG*.png" D:\photos
 
-Note: quotes are necessary under Linux
+Note: quotes are necessary under Linux.
